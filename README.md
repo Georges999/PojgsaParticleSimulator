@@ -26,13 +26,12 @@ The Particle Simulator is an interactive application that simulates the behavior
 ## Getting Started
 To run the Particle Simulator:
 1. Clone the repository to your local machine.
-2. Open the solution file in Visual Studio.
-3. Build the project.
-4. Run the application to start simulating particles!
+    ```bash
+   git clone https://github.com/Georges999/PojgsaParticleSimulator.git
+    
+3. Open the solution file in Visual Studio.
+4. Build the project.
+5. Run the application to start simulating particles!
 
 ## Contributing
 Contributions are welcome! If you have ideas for new features or improvements, feel free to create a pull request.
-
-## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
