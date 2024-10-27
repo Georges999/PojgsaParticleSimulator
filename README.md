@@ -6,11 +6,24 @@
 The Particle Simulator is an interactive application that simulates the behavior of particles in a 2D space. Users can add particles, adjust gravity, and control the simulation speed using an intuitive toolbox. The simulator provides a visual representation of basic physics concepts such as gravity, collision detection, and particle interactions. It serves as an educational tool for understanding fundamental physics and dynamics in a fun and engaging way.
 
 ## Features
-- **Particle Creation:** Dynamically add particles to the simulation.
-- **Gravity Control:** Adjust the gravitational force affecting the particles through a trackbar or numeric input.
-- **Time Scaling:** Control the speed of the simulation with a dedicated trackbar.
-- **Collision Detection:** Realistic particle collisions with energy conservation principles.
-- **Dynamic Rendering:** Smooth rendering using double buffering to eliminate flickering.
+- **Realistic Particle Dynamics:** 
+  - Simulates the behavior of particles with properties like gravity, velocity, and collision detection, allowing for realistic interactions between particles.
+
+- **Customizable Gravity:** 
+  - Users can adjust the gravitational force affecting the particles in real-time through a user-friendly interface, enabling them to see how changes in gravity affect motion.
+
+- **Dynamic Particle Creation:** 
+  - Add new particles dynamically during simulation. Each particle can have unique properties such as size and velocity, offering endless experimentation possibilities.
+
+- **Time Scale Control:** 
+  - Modify the speed of the simulation using a time scale slider. This feature allows users to observe particle behaviors in slow motion or fast-forward, providing insights into their movements.
+
+- **Interactive Toolbox:** 
+  - The toolbox provides various controls, including buttons for adding particles, sliders for adjusting gravity, and numerical inputs for precise control. This makes the simulator accessible and easy to use.
+
+- **Double Buffering for Smooth Rendering:** 
+  - Implements double buffering to eliminate flickering during rendering, ensuring a smooth visual experience while interacting with the simulation.
+
 - **Future Enhancements:**
   - Introduction of different particle shapes, such as cubes.
   - Implementation of water physics for more complex interactions.
