@@ -223,7 +223,7 @@ namespace PojgsaParticleSimulator
                 windIntensityControl.Visible = true;
                 windDirectionLabel.Visible = true;
                 windDirectionControl.Visible = true;
-                this.Size = new Size(200, 400); // Restore original size
+                this.Size = new Size(200, 500); // Restore original size
                 minimizeButton.Text = "-";
             }
         }
