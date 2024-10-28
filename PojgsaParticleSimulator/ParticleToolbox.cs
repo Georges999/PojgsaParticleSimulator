@@ -15,6 +15,14 @@ namespace PojgsaParticleSimulator
         private Button minimizeButton;
         private bool isMinimized = false;
         private Form1 mainForm;
+        private Label windIntensityLabel;
+        private NumericUpDown windIntensityControl;
+        private Label windDirectionLabel;
+        private NumericUpDown windDirectionControl;
+        private CheckBox windVectorCheckBox;
+        private CheckBox velocityVectorCheckBox;
+        private CheckBox gravityVectorCheckBox;
+
 
         public ParticleToolbox(Form1 form)
         {
@@ -24,7 +32,7 @@ namespace PojgsaParticleSimulator
 
         private void InitializeComponents()
         {
-            this.Size = new Size(200, 400);
+            this.Size = new Size(200, 500);
             this.BackColor = Color.LightGray;
 
             // Minimize Button
@@ -59,8 +67,8 @@ namespace PojgsaParticleSimulator
             // Gravity TrackBar
             gravityTrackBar = new TrackBar
             {
-                Minimum = -20,
-                Maximum = 20,
+                Minimum = -30,
+                Maximum = 30,
                 Value = 10,
                 Location = new Point(10, 70),
                 Width = 180
@@ -71,8 +79,8 @@ namespace PojgsaParticleSimulator
             // Gravity NumericUpDown
             gravityNumericUpDown = new NumericUpDown
             {
-                Minimum = -20,
-                Maximum = 20,
+                Minimum = -30,
+                Maximum = 30,
                 Value = 10,
                 DecimalPlaces = 2,
                 Increment = 0.1M,
@@ -102,7 +110,84 @@ namespace PojgsaParticleSimulator
             };
             timeScaleTrackBar.Scroll += TimeScaleTrackBar_Scroll;
             this.Controls.Add(timeScaleTrackBar);
+
+            // Wind Intensity Label
+            windIntensityLabel = new Label
+            {
+                Text = "Wind Intensity ",
+                Location = new Point(10, 239),
+                Width = 180
+            };
+            this.Controls.Add(windIntensityLabel);
+
+            // Wind Intensity Control
+            windIntensityControl = new NumericUpDown
+            {
+                Minimum = 0,
+                Maximum = 100,
+                Value = 0,
+                DecimalPlaces = 1,
+                Increment = 0.5M,
+                Location = new Point(10, 260),
+                Width = 180
+            };
+            windIntensityControl.ValueChanged += WindIntensityControl_ValueChanged;
+            this.Controls.Add(windIntensityControl);
+
+            // Wind Direction Label
+            windDirectionLabel = new Label
+            {
+                Text = "Wind Direction: 0°",
+                Location = new Point(10, 290),
+                Width = 180
+            };
+            this.Controls.Add(windDirectionLabel);
+
+            // Wind Direction Control
+            windDirectionControl = new NumericUpDown
+            {
+                Minimum = 0,
+                Maximum = 360,
+                Value = 0,
+                Location = new Point(10, 310),
+                Width = 180
+            };
+            windDirectionControl.ValueChanged += WindDirectionControl_ValueChanged;
+            this.Controls.Add(windDirectionControl);
+
+            // Wind Vector CheckBox
+            windVectorCheckBox = new CheckBox
+            {
+                Text = "Show Wind Vector",
+                Location = new Point(10, 340),
+                Checked = true // Default to checked
+            };
+            windVectorCheckBox.CheckedChanged += WindVectorCheckBox_CheckedChanged;
+            this.Controls.Add(windVectorCheckBox);
+
+            // Velocity Vector CheckBox
+            velocityVectorCheckBox = new CheckBox
+            {
+                Text = "Show Velocity Vectors",
+                Location = new Point(10, 365),
+                Checked = true // Default to checked
+            };
+            velocityVectorCheckBox.CheckedChanged += VelocityVectorCheckBox_CheckedChanged;
+            this.Controls.Add(velocityVectorCheckBox);
+
+            // Gravity Vector CheckBox
+            gravityVectorCheckBox = new CheckBox
+            {
+                Text = "Show Gravity Vector",
+                Location = new Point(10, 390),
+                Checked = true // Default to checked
+            };
+            gravityVectorCheckBox.CheckedChanged += GravityVectorCheckBox_CheckedChanged;
+            this.Controls.Add(gravityVectorCheckBox);
+
         }
+
+
 
         private void MinimizeButton_Click(object sender, EventArgs e)
         {
@@ -118,6 +203,10 @@ namespace PojgsaParticleSimulator
                 gravityNumericUpDown.Visible = false;
                 timeScaleLabel.Visible = false;
                 timeScaleTrackBar.Visible = false;
+                windIntensityLabel.Visible = false;
+                windIntensityControl.Visible = false;
+                windDirectionLabel.Visible = false;
+                windDirectionControl.Visible = false;
                 this.Size = new Size(200, 30); // Adjust to smaller size
                 minimizeButton.Text = "+";
             }
@@ -130,6 +219,10 @@ namespace PojgsaParticleSimulator
                 gravityNumericUpDown.Visible = true;
                 timeScaleLabel.Visible = true;
                 timeScaleTrackBar.Visible = true;
+                windIntensityLabel.Visible = true;
+                windIntensityControl.Visible = true;
+                windDirectionLabel.Visible = true;
+                windDirectionControl.Visible = true;
                 this.Size = new Size(200, 400); // Restore original size
                 minimizeButton.Text = "-";
             }
@@ -161,6 +254,35 @@ namespace PojgsaParticleSimulator
             float timeScale = timeScaleTrackBar.Value / 10f;
             timeScaleLabel.Text = $"Time Scale: {timeScale}x";
             mainForm.UpdateTimeScale(timeScale);
+        }
+
+        private void WindIntensityControl_ValueChanged(object sender, EventArgs e)
+        {
+            float windIntensity = (float)windIntensityControl.Value;
+            windIntensityLabel.Text = $"Wind Intensity: {windIntensity}";
+            mainForm.UpdateWindIntensity(windIntensity);
+        }
+
+        private void WindDirectionControl_ValueChanged(object sender, EventArgs e)
+        {
+            int windDirection = (int)windDirectionControl.Value;
+            windDirectionLabel.Text = $"Wind Direction: {windDirection}°";
+            mainForm.UpdateWindDirection(windDirection);
+        }
+
+        private void WindVectorCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            Particle.ShowWindVector = windVectorCheckBox.Checked;
+        }
+
+        private void VelocityVectorCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            Particle.ShowVelocityVector = velocityVectorCheckBox.Checked;
+        }
+
+        private void GravityVectorCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            Particle.ShowGravityVector = gravityVectorCheckBox.Checked;
         }
     }
 }

@@ -14,7 +14,14 @@ namespace PojgsaParticleSimulator
         public bool IsAlive => Lifetime > 0; // Check if particle is alive
         private static float Gravity = 9.81f; // Gravity constant
         private static readonly float Damping = 0.99f; // Damping factor for energy loss
-        private static readonly float Restitution = 0.8f; // Coefficient of restitution
+        private static readonly float Restitution = 0.8f; // Coefficient of restitution                             
+        public static float WindIntensity { get; set; } = 0.0f; // Wind intensity
+        public static float WindDirection { get; set; } = 0.0f; // Wind direction in radians (0 = right, π/2 = up, etc.)
+
+        public static bool ShowWindVector { get; set; } = true; // Toggle for wind vector visibility
+        public static bool ShowVelocityVector { get; set; } = true; // Toggle for velocity vector visibility
+        public static bool ShowGravityVector { get; set; } = true; // Toggle for gravity vector visibility
+
 
         public Particle(float x, float y, float velocityX, float velocityY, float sizeFactor, float lifetime)
         {
@@ -29,11 +36,30 @@ namespace PojgsaParticleSimulator
             Lifetime = lifetime;
         }
 
+        public static float GetGravity()
+        {
+            return Gravity;
+        }
+
         public static void SetGravity(float newGravity)
         {
             Gravity = newGravity;
         }
+        public static void SetWind(float intensity, float direction)
+        {
+            WindIntensity = intensity;
+            WindDirection = direction;
+        }
 
+        public static float GetWindIntensity()
+        {
+            return WindIntensity;
+        }
+
+        public static float GetWindDirection()
+        {
+            return WindDirection;
+        }
 
         public void Update(float deltaTime, int screenWidth, int screenHeight)
         {
@@ -41,6 +67,10 @@ namespace PojgsaParticleSimulator
 
             // Apply gravity
             VelocityY += Gravity * deltaTime;
+
+            // Apply wind effect
+            VelocityX += WindIntensity * (float)Math.Cos(WindDirection) * deltaTime;
+            VelocityY += WindIntensity * (float)Math.Sin(WindDirection) * deltaTime;
 
             // Update position
             X += VelocityX * deltaTime;
