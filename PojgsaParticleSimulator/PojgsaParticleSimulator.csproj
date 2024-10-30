@@ -70,6 +70,9 @@
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="InitialSettingsForm.resx">
+      <DependentUpon>InitialSettingsForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ParticleToolbox1.resx">
       <DependentUpon>ParticleToolbox1.cs</DependentUpon>
     </EmbeddedResource>
