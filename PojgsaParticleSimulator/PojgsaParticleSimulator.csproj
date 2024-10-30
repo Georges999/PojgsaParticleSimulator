@@ -52,6 +52,12 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="InitialSettingsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="InitialSettingsForm.Designer.cs">
+      <DependentUpon>InitialSettingsForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Particle.cs" />
     <Compile Include="ParticleToolbox.cs">
       <SubType>UserControl</SubType>

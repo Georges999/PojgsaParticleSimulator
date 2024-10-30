@@ -13,7 +13,39 @@ namespace PojgsaParticleSimulator
         private ParticleToolbox toolbox; // Ensure this is declared here
         private float timeScale = 1.0f;
         private Bitmap offscreenBitmap;
+        private float gravity;
+        private float windIntensity;
+        private float windDirection;
+        private int particleCount;
 
+        public Form1(float gravity, float windIntensity, float windDirection, int particleCount, float timeScale)
+        {
+            InitializeComponent();
+            this.DoubleBuffered = true;  // Enable double buffering
+            this.Resize += Form1_Resize; // Add resize event
+
+            this.gravity = gravity;
+            this.windIntensity = windIntensity;
+            this.windDirection = windDirection;
+            this.particleCount = particleCount;
+            this.timeScale = timeScale;
+
+            Particle.SetGravity(gravity);
+            Particle.SetWind(windIntensity, windDirection);
+
+            toolbox = new ParticleToolbox(this); // Initialize toolbox
+            this.Controls.Add(toolbox); // Add toolbox to form's controls
+
+            // Initialize timer
+            timer = new Timer();
+            timer.Interval = 18; // Approximately 60 FPS
+            timer.Tick += Timer_Tick;
+            timer.Start();
+
+            InitializeParticles();
+        }
+
+        //Referrence form, this form perfectly demonstrates the particles with window resizing, double buffering, and timer tick.
         public Form1()
         {
             InitializeComponent();
@@ -46,24 +78,24 @@ namespace PojgsaParticleSimulator
 
         private void InitializeParticles()
         {
-            // Initialize offscreen bitmap
             offscreenBitmap = new Bitmap(ClientSize.Width, ClientSize.Height);
+            Random rand = new Random();
 
-            Random rand = new Random(); // Ensure you have a Random instance
-            for (int i = 0; i < 78; i++)
+            for (int i = 0; i < particleCount; i++)
             {
-                float sizeFactor = (float)(rand.NextDouble() * 1.5 + 0.5); // Size factor between 0.5 and 2.0
+                float sizeFactor = (float)(rand.NextDouble() * 1.5 + 0.5);
 
                 particles.Add(new Particle(
                     x: rand.Next(ClientSize.Width),
                     y: rand.Next(ClientSize.Height),
-                    velocityX: (float)(rand.NextDouble() * 200 - 100), // Random velocity between -100 and 100
-                    velocityY: (float)(rand.NextDouble() * 200 - 100), // Random velocity between -100 and 100
-                    sizeFactor: sizeFactor, // Pass the size factor instead of a fixed radius
-                    lifetime: 100000f // Lifetime in seconds
+                    velocityX: (float)(rand.NextDouble() * 200 - 100),
+                    velocityY: (float)(rand.NextDouble() * 200 - 100),
+                    sizeFactor: sizeFactor,
+                    lifetime: 100000f
                 ));
             }
         }
+
 
         // Method to update gravity
         public void UpdateGravity(float gravity)
