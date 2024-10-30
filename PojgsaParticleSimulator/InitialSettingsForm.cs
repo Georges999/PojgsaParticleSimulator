@@ -13,11 +13,11 @@ namespace PojgsaParticleSimulator
     public partial class InitialSettingsForm : Form
     {
         // Properties for initial settings
-        public float Gravity { get; private set; } = 9.81f;  // Default value
+        public float Gravity { get; private set; } = 9.81f;
         public float WindIntensity { get; private set; }
         public float WindDirection { get; private set; }
-        public int ParticleCount { get; private set; } = 50; // Default value
-        public float TimeScale { get; private set; }
+        public int ParticleCount { get; private set; } = 50; 
+        public float TimeScale { get; private set; } = 1;
 
         private TextBox gravityTextBox;
         private TextBox windIntensityTextBox;

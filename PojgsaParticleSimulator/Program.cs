@@ -1,22 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace PojgsaParticleSimulator
 {
-    internal static class Program
+    static class Program
     {
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
         [STAThread]
         static void Main()
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+
+            // Show InitialSettingsForm to collect initial settings
+            InitialSettingsForm settingsForm = new InitialSettingsForm();
+            if (settingsForm.ShowDialog() == DialogResult.OK)
+            {
+                // Use the values from InitialSettingsForm to initialize Form1
+                Application.Run(new Form1(
+                    settingsForm.Gravity,
+                    settingsForm.WindIntensity,
+                    settingsForm.WindDirection,
+                    settingsForm.ParticleCount,
+                    settingsForm.TimeScale
+                ));
+            }
         }
     }
 }
+

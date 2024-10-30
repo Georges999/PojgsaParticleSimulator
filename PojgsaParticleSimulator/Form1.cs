@@ -21,6 +21,8 @@ namespace PojgsaParticleSimulator
         public Form1(float gravity, float windIntensity, float windDirection, int particleCount, float timeScale)
         {
             InitializeComponent();
+            this.DoubleBuffered = true;  // Enable double buffering
+            this.Resize += Form1_Resize; // Add resize event
 
             this.gravity = gravity;
             this.windIntensity = windIntensity;
@@ -31,10 +33,19 @@ namespace PojgsaParticleSimulator
             Particle.SetGravity(gravity);
             Particle.SetWind(windIntensity, windDirection);
 
+            toolbox = new ParticleToolbox(this); // Initialize toolbox
+            this.Controls.Add(toolbox); // Add toolbox to form's controls
+
+            // Initialize timer
+            timer = new Timer();
+            timer.Interval = 18; // Approximately 60 FPS
+            timer.Tick += Timer_Tick;
+            timer.Start();
+
             InitializeParticles();
         }
 
-
+        //Referrence form, this form perfectly demonstrates the particles with window resizing, double buffering, and timer tick.
         public Form1()
         {
             InitializeComponent();
