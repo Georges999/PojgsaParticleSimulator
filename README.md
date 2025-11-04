@@ -1,6 +1,6 @@
 # Pojgsa Particle Simulator
 
-![Particle Simulator](https://img.shields.io/badge/Status-Active-green)
+
 
 ## Description
 The Particle Simulator is an interactive application that simulates the behavior of particles in a 2D space. Users can add particles, adjust gravity, and control the simulation speed using an intuitive toolbox. The simulator provides a visual representation of basic physics concepts such as gravity, collision detection, and particle interactions. It serves as an educational tool for understanding fundamental physics and dynamics in a fun and engaging way.
