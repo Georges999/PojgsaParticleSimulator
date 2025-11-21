@@ -1,231 +1,232 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Windows.Forms;
 using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Numerics;
+using System.Windows.Forms;
 
 namespace PojgsaParticleSimulator
 {
     public partial class Form1 : Form
     {
         private List<Particle> particles = new List<Particle>();
-        private Timer timer;
+        private System.Windows.Forms.Timer timer;
         private Random rand = new Random();
-        private ParticleToolbox toolbox; // Ensure this is declared here
+        private ParticleToolbox toolbox;
         private float timeScale = 1.0f;
         private Bitmap offscreenBitmap;
-        private float gravity;
-        private float windIntensity;
-        private float windDirection;
-        private int particleCount;
+        private SimulationGrid grid;
+
+        // Interaction
+        private Vector2 mousePos;
+        private bool isMouseDown;
+        private bool isRightClick;
+
+        public Form1()
+        {
+            InitializeComponent();
+            SetupForm();
+            InitializeSimulation();
+            for (int i = 0; i < 200; i++) CreateParticle();
+        }
 
         public Form1(float gravity, float windIntensity, float windDirection, int particleCount, float timeScale)
         {
             InitializeComponent();
-            this.DoubleBuffered = true;  // Enable double buffering
-            this.Resize += Form1_Resize; // Add resize event
-
-            this.gravity = gravity;
-            this.windIntensity = windIntensity;
-            this.windDirection = windDirection;
-            this.particleCount = particleCount;
-            this.timeScale = timeScale;
+            SetupForm();
+            InitializeSimulation();
 
             Particle.SetGravity(gravity);
-            Particle.SetWind(windIntensity, windDirection);
+            UpdateWindDirection((int)windDirection);
+            UpdateWindIntensity(windIntensity);
+            this.timeScale = timeScale;
 
-            toolbox = new ParticleToolbox(this); // Initialize toolbox
-            this.Controls.Add(toolbox); // Add toolbox to form's controls
-
-            // Initialize timer
-            timer = new Timer();
-            timer.Interval = 18; // Approximately 60 FPS
-            timer.Tick += Timer_Tick;
-            timer.Start();
-
-            InitializeParticles();
+            for (int i = 0; i < particleCount; i++) CreateParticle();
         }
 
-        //Referrence form, this form perfectly demonstrates the particles with window resizing, double buffering, and timer tick.
-        public Form1()
+        private void SetupForm()
         {
-            InitializeComponent();
-            this.DoubleBuffered = true;  // Enable double buffering
-            this.Resize += Form1_Resize; // Add resize event
+            this.DoubleBuffered = true;
+            this.Resize += Form1_Resize;
+            this.BackColor = Color.FromArgb(20, 20, 30); // Dark blue-black background
+            this.WindowState = FormWindowState.Maximized;
+            
+            // Mouse Events
+            this.MouseMove += (s, e) => mousePos = new Vector2(e.X, e.Y);
+            this.MouseDown += (s, e) => 
+            { 
+                isMouseDown = true; 
+                isRightClick = e.Button == MouseButtons.Right; 
+            };
+            this.MouseUp += (s, e) => isMouseDown = false;
 
-            toolbox = new ParticleToolbox(this); // Initialize toolbox
-            this.Controls.Add(toolbox); // Add toolbox to form's controls
-
-            // Initialize timer
-            timer = new Timer();
-            timer.Interval = 18; // Approximately 60 FPS
-            timer.Tick += Timer_Tick;
-            timer.Start();
-
-            // Initialize particles
-            InitializeParticles();
+            // Toolbox
+            toolbox = new ParticleToolbox(this);
+            this.Controls.Add(toolbox);
         }
 
-        private void Form1_Resize(object sender, EventArgs e)
+        private void InitializeSimulation()
         {
-            // Recreate offscreen bitmap to match new form size
+            int width = Math.Max(ClientSize.Width, 100);
+            int height = Math.Max(ClientSize.Height, 100);
+
+            // Initialize Grid (Cell size ~ max particle diameter * 2)
+            grid = new SimulationGrid(width, height, 50);
+
+            // Timer
+            timer = new System.Windows.Forms.Timer();
+            timer.Interval = 16; // ~60 FPS
+            timer.Tick += Timer_Tick;
+            timer.Start();
+        }
+
+        private void Form1_Resize(object? sender, EventArgs e)
+        {
             if (ClientSize.Width > 0 && ClientSize.Height > 0)
             {
                 offscreenBitmap = new Bitmap(ClientSize.Width, ClientSize.Height);
+                // Re-init grid with new dimensions
+                grid = new SimulationGrid(ClientSize.Width, ClientSize.Height, 50);
             }
         }
 
-
-
-        private void InitializeParticles()
+        private void Form1_Load(object? sender, EventArgs e)
         {
-            offscreenBitmap = new Bitmap(ClientSize.Width, ClientSize.Height);
-            Random rand = new Random();
-
-            for (int i = 0; i < particleCount; i++)
-            {
-                float sizeFactor = (float)(rand.NextDouble() * 1.5 + 0.5);
-
-                particles.Add(new Particle(
-                    x: rand.Next(ClientSize.Width),
-                    y: rand.Next(ClientSize.Height),
-                    velocityX: (float)(rand.NextDouble() * 200 - 100),
-                    velocityY: (float)(rand.NextDouble() * 200 - 100),
-                    sizeFactor: sizeFactor,
-                    lifetime: 100000f
-                ));
-            }
         }
 
-
-        // Method to update gravity
-        public void UpdateGravity(float gravity)
+        public void CreateParticle(Vector2? pos = null)
         {
-            Particle.SetGravity(gravity); // Assuming you have a static method in Particle to set gravity
-        }
-
-        public void UpdateTimeScale(float scale)
-        {
-            // Adjust the simulation speed by modifying the timer interval or deltaTime
-            timeScale = scale;
-
-        }
-        public void UpdateWindIntensity(float intensity)
-        {
-            Particle.SetWind(intensity, Particle.GetWindDirection()); // Ensure to use current wind direction
-        }
-
-        public void UpdateWindDirection(int direction)
-        {
-            Particle.SetWind(Particle.GetWindIntensity(), direction); // Ensure to use current wind intensity
-        }
-
-        public void CreateParticle()
-        {
-            float sizeFactor = (float)(rand.NextDouble() * 1.5 + 0.5); // Size factor between 0.5 and 2.0
-
-            Particle newParticle = new Particle(
-                x: rand.Next(ClientSize.Width),
-                y: rand.Next(ClientSize.Height),
-                velocityX: (float)(rand.NextDouble() * 200 - 100), // Random velocity between -100 and 100
-                velocityY: (float)(rand.NextDouble() * 200 - 100), // Random velocity between -100 and 100
-                sizeFactor: sizeFactor, // Use the size factor
-                lifetime: 100000f // Lifetime in seconds
+            Vector2 p = pos ?? new Vector2(rand.Next(ClientSize.Width), rand.Next(ClientSize.Height));
+            Vector2 v = new Vector2((float)rand.NextDouble() * 400 - 200, (float)rand.NextDouble() * 400 - 200);
+            float radius = (float)(rand.NextDouble() * 5 + 3); // 3 to 8 radius
+            float lifetime = 60.0f; // seconds
+            
+            // Random color
+            Color c = Color.FromArgb(
+                rand.Next(100, 255),
+                rand.Next(100, 255),
+                rand.Next(200, 255)
             );
 
-            particles.Add(newParticle);
-            Invalidate();// request redraw to show the new particle
+            particles.Add(new Particle(p, v, radius, lifetime, c));
         }
-        private void Timer_Tick(object sender, EventArgs e)
-        {
-            float deltaTime = timer.Interval / 100f * timeScale; // Scale deltaTime by timeScale;
 
-            foreach (var particle in particles)
+        // Public methods for Toolbox interactions
+        public void UpdateGravity(float gravity) => Particle.SetGravity(gravity);
+        public void UpdateWindIntensity(float intensity) => Particle.Wind = Vector2.Normalize(Particle.Wind == Vector2.Zero ? Vector2.UnitX : Particle.Wind) * intensity;
+        public void UpdateWindDirection(int degrees) 
+        {
+             float radians = degrees * (float)Math.PI / 180f;
+             float intensity = Particle.Wind.Length();
+             Particle.SetWind(intensity, radians);
+        }
+        public void UpdateTimeScale(float scale) => timeScale = scale;
+        public void ClearParticles() => particles.Clear();
+
+
+        private void Timer_Tick(object? sender, EventArgs e)
+        {
+            float dt = 0.016f * timeScale;
+            int w = ClientSize.Width;
+            int h = ClientSize.Height;
+            int subSteps = 4;
+            float subDt = dt / subSteps;
+
+            if (w == 0 || h == 0) return;
+
+            for (int step = 0; step < subSteps; step++)
             {
-                particle.Update(deltaTime, ClientSize.Width, ClientSize.Height);
+                grid.Clear();
+
+                // Update and Add to Grid
+                for (int i = particles.Count - 1; i >= 0; i--)
+                {
+                    var p = particles[i];
+                    if (!p.IsAlive && step == 0) // Only remove once per frame
+                    {
+                        particles.RemoveAt(i);
+                        continue;
+                    }
+
+                    // Interaction (Apply once per frame or scaled per sub-step)
+                    if (step == 0 && isMouseDown)
+                    {
+                        Vector2 dir = mousePos - p.Position;
+                        float dist = dir.Length();
+                        if (dist > 10 && dist < 400)
+                        {
+                            dir = Vector2.Normalize(dir);
+                            float strength = isRightClick ? -1000f : 1000f;
+                            p.ApplyForce(dir * strength / dist); 
+                        }
+                    }
+
+                    p.Update(subDt, w, h);
+                    grid.AddParticle(p);
+                }
+
+                // Collision Resolution
+                grid.HandleCollisions();
             }
 
-            HandleParticleCollisions();
-
-            Invalidate(); // Request to redraw the form (might be causing the flickering)
+            Invalidate();
         }
 
         protected override void OnPaint(PaintEventArgs e)
         {
+            if (offscreenBitmap == null)
+            {
+                if (ClientSize.Width > 0 && ClientSize.Height > 0)
+                     offscreenBitmap = new Bitmap(ClientSize.Width, ClientSize.Height);
+                else return;
+            }
+
             using (Graphics g = Graphics.FromImage(offscreenBitmap))
             {
-                g.Clear(this.BackColor); // Clear with form's background color
-                foreach (var particle in particles)
+                g.SmoothingMode = SmoothingMode.AntiAlias;
+                g.Clear(this.BackColor);
+
+                foreach (var p in particles)
                 {
-                    if (particle.IsAlive)
+                    // Speed-based color intensity
+                    float speed = p.Velocity.Length();
+                    int alpha = Math.Min(255, (int)(p.Lifetime / p.MaxLifetime * 255));
+                    
+                    // Draw Particle
+                    using (Brush brush = new SolidBrush(Color.FromArgb(alpha, p.Color)))
                     {
-                        Brush brush = new SolidBrush(Color.Black);
-                        g.FillEllipse(brush, particle.X - particle.Radius, particle.Y - particle.Radius, particle.Radius * 2, particle.Radius * 2);
+                        g.FillEllipse(brush, p.Position.X - p.Radius, p.Position.Y - p.Radius, p.Radius * 2, p.Radius * 2);
                     }
 
+                    // Draw Vectors (Optional)
                     if (Particle.ShowVelocityVector)
-                    {
-                        DrawVector(g, particle.X, particle.Y, particle.VelocityX, particle.VelocityY, Color.Blue);
-                    }
-
-                    // Draw gravity vector
+                        DrawVector(g, p.Position, p.Velocity * 0.1f, Color.Yellow);
                     if (Particle.ShowGravityVector)
-                    {
-                        DrawVector(g, particle.X, particle.Y, 0, Particle.GetGravity(), Color.Red);
-                    }
-
-                    // Draw wind vector (implement wind direction and magnitude logic)
+                        DrawVector(g, p.Position, new Vector2(0, Particle.Gravity * 5), Color.Red); // Simple visual
                     if (Particle.ShowWindVector)
-                    {
-                        float windX = (float)(Particle.GetWindIntensity() * Math.Cos(Particle.GetWindDirection() * Math.PI / 180));
-                        float windY = (float)(Particle.GetWindIntensity() * Math.Sin(Particle.GetWindDirection() * Math.PI / 180));
-                        DrawVector(g, particle.X, particle.Y, windX, windY, Color.Green);
-                    }
+                        DrawVector(g, p.Position, Particle.Wind * 10, Color.Green);
                 }
-            }
-            e.Graphics.DrawImage(offscreenBitmap, 0, 0);  // Draw the offscreen bitmap to the form
-        }
-        private void DrawVector(Graphics g, float startX, float startY, float vectorX, float vectorY, Color color)
-        {
-            Pen pen = new Pen(color, 2);
-            g.DrawLine(pen, startX, startY, startX + vectorX, startY + vectorY);
-            // Optionally draw an arrowhead
-            float arrowHeadLength = 10;
-            float arrowHeadAngle = (float)Math.PI / 6; // 30 degrees
-            float angle = (float)Math.Atan2(vectorY, vectorX);
-
-            // Arrowhead points
-            float x1 = startX + vectorX - arrowHeadLength * (float)Math.Cos(angle - arrowHeadAngle);
-            float y1 = startY + vectorY - arrowHeadLength * (float)Math.Sin(angle - arrowHeadAngle);
-            float x2 = startX + vectorX - arrowHeadLength * (float)Math.Cos(angle + arrowHeadAngle);
-            float y2 = startY + vectorY - arrowHeadLength * (float)Math.Sin(angle + arrowHeadAngle);
-
-            g.DrawLine(pen, startX + vectorX, startY + vectorY, x1, y1);
-            g.DrawLine(pen, startX + vectorX, startY + vectorY, x2, y2);
-        }
-
-        private void HandleParticleCollisions()
-        {
-            for (int i = 0; i < particles.Count; i++)
-            {
-                for (int j = i + 1; j < particles.Count; j++)
+                
+                // Draw Interaction Indicator
+                if (isMouseDown)
                 {
-                    Particle particleA = particles[i];
-                    Particle particleB = particles[j];
-
-                    if (particleA.CheckCollision(particleB))
+                    Color c = isRightClick ? Color.Red : Color.Green;
+                    using (Pen pen = new Pen(Color.FromArgb(50, c), 2))
                     {
-                        // Resolve collision
-                        particleA.ResolveCollision(particleB);
+                        g.DrawEllipse(pen, mousePos.X - 20, mousePos.Y - 20, 40, 40);
                     }
                 }
             }
+
+            e.Graphics.DrawImage(offscreenBitmap, 0, 0);
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void DrawVector(Graphics g, Vector2 start, Vector2 vector, Color color)
         {
-
+            using (Pen pen = new Pen(color, 1))
+            {
+                g.DrawLine(pen, start.X, start.Y, start.X + vector.X, start.Y + vector.Y);
+            }
         }
     }
 }
-
-

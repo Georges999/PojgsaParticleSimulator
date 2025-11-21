@@ -30,24 +30,80 @@ namespace PojgsaParticleSimulator
         {
             InitializeComponent();
 
-            // Labels and TextBoxes for inputs
-            Label gravityLabel = new Label { Text = "Gravity:", Location = new Point(10, 10), AutoSize = true };
-            gravityTextBox = new TextBox { Text = Gravity.ToString(), Location = new Point(120, 10) };
+            // Title Label
+            Label titleLabel = new Label
+            {
+                Text = "Pojgsa Particle Simulator",
+                Font = new Font("Arial", 18, FontStyle.Bold),
+                ForeColor = Color.DarkBlue,
+                Location = new Point(10, 10),
+                AutoSize = true
+            };
+            Controls.Add(titleLabel);
 
-            Label windIntensityLabel = new Label { Text = "Wind Intensity:", Location = new Point(10, 40), AutoSize = true };
-            windIntensityTextBox = new TextBox { Text = WindIntensity.ToString(), Location = new Point(120, 40) };
+            // Labels and TextBoxes for inputs with improved spacing and font styling
+            Label gravityLabel = new Label
+            { Text = "Gravity:",
+                Location = new Point(10, 50),
+                Font = new Font("Arial", 10),
+                AutoSize = true};
+            gravityTextBox = new TextBox
+            { Text = "9.81",
+                Location = new Point(120, 50),
+                Width = 80};
 
-            Label windDirectionLabel = new Label { Text = "Wind Direction:", Location = new Point(10, 70), AutoSize = true };
-            windDirectionTextBox = new TextBox { Text = WindDirection.ToString(), Location = new Point(120, 70) };
+            Label windIntensityLabel = new Label
+            { Text = "Wind Intensity:",
+                Location = new Point(10, 80),
+                Font = new Font("Arial", 10),
+                AutoSize = true};
+            windIntensityTextBox = new TextBox
+            {Text = "0",
+             Location = new Point(120, 80),
+             Width = 80};
 
-            Label particleCountLabel = new Label { Text = "Particle Count:", Location = new Point(10, 100), AutoSize = true };
-            particleCountTextBox = new TextBox { Text = ParticleCount.ToString(), Location = new Point(120, 100) };
+            Label windDirectionLabel = new Label
+            { Text = "Wind Direction:",
+                Location = new Point(10, 110),
+                Font = new Font("Arial", 10),
+                 AutoSize = true};
+            windDirectionTextBox = new TextBox
+            {Text = "0",
+                Location = new Point(120, 110),
+                Width = 80};
 
-            Label timeScaleLabel = new Label { Text = "Time Scale:", Location = new Point(10, 130), AutoSize = true };
-            timeScaleTextBox = new TextBox { Text = TimeScale.ToString(), Location = new Point(120, 130) };
+            Label particleCountLabel = new Label
+            {Text = "Particle Count:",
+                Location = new Point(10, 140),
+                Font = new Font("Arial", 10),
+                AutoSize = true};
+            particleCountTextBox = new TextBox
+            {Text = "50",
+                Location = new Point(120, 140),
+                Width = 80};
+
+            Label timeScaleLabel = new Label
+            {Text = "Time Scale:",
+                Location = new Point(10, 170),
+                Font = new Font("Arial", 10),
+                AutoSize = true};
+            timeScaleTextBox = new TextBox
+            { Text = "1.0",
+                Location = new Point(120, 170),
+                Width = 80};
 
             // Start button setup
-            startButton = new Button { Text = "Start", Location = new Point(10, 170) };
+            startButton = new Button
+            {
+                Text = "Start Simulation",
+                Location = new Point(10, 210),
+                Font = new Font("Arial", 10, FontStyle.Bold),
+                BackColor = Color.LightSkyBlue,
+                ForeColor = Color.Black,
+                Width = 190,
+                Height = 30
+            };
+
             startButton.Click += startButton_Click;
 
             // Add controls to form
